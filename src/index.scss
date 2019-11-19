@@ -1,12 +1,12 @@
-$input-color: #7dbbc3;
+$input-color: #7b14f1;
 $button-color: #f4b9b2;
-$info-color: #daedbd;
+$info-color: #d6dee2;
 $comment-highlight-color: #de6b48;
-$danger-color: #de6b48;
+$danger-color: #ec0a4e;
 
 @mixin button($color) {
   background-color: $color;
-  border: 1px solid darken($color, 10);
+  border: none;
   &:hover {
     background-color: lighten($color, 10);
   }
@@ -45,7 +45,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"] {
   border: none;
-  border-bottom: 1px solid $input-color;
+  border-bottom: 2px solid $info-color;
   font-size: 1.5em;
   padding: 0.5em;
 }
@@ -56,15 +56,35 @@ input[type="submit"],
   display: block;
   width: 100%;
   font-size: 1.1em;
-  padding: 0.5em;
+  padding: 0.5em 1em;
   @include button($button-color);
+  transition: all 0.2s ease-out;
+  border-radius: 3px;
   &.star,
   &.create,
   &.update {
     @include button($input-color);
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
   }
   &.delete {
     @include button($danger-color);
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+  }
+  &.create {
+    width: 130px;
+    margin: 1em 0 1em auto;
+    text-transform: uppercase;
+    border: 2px solid $input-color;
+    background-color: transparent;
+    color: $input-color;
+
+    &:hover {
+      color: white;
+    }
   }
 }
 
@@ -148,8 +168,10 @@ input[type="file"] {
 }
 
 .Post {
-  border: 1px solid $input-color;
-  margin-bottom: 1em;
+  background-color: #fafafa;
+  margin-bottom: 2em;
+  box-shadow: 0 3px 6px rgba($color: #000000, $alpha: 0.1);
+  border-top: 2px solid $input-color;
 }
 
 .Post--content {
