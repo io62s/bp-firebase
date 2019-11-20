@@ -1,64 +1,47 @@
 import React, { Component } from "react";
-import { firestore } from "../firebase";
+import Authentication from "./Authentication";
+import { firestore, auth } from "../firebase";
 import { collectIdsAndDocs } from "../utilities";
 
 import Posts from "./Posts";
 
 class Application extends Component {
   state = {
-    posts: []
+    posts: [],
+    user: null
   };
 
-  getPosts = async () => {
-    const snapshot = await firestore.collection("posts").get();
+  unsubscribeFromFirestore = null;
+  unsubscribeFromAuth = null;
 
-    const posts = snapshot.docs.map(collectIdsAndDocs);
-
-    this.setState({
-      posts
-    });
-
-    // console.log({ snapshot });
+  getPosts = () => {
+    this.unsubscribeFromFirestore = firestore
+      .collection("posts")
+      .onSnapshot(snapshot => {
+        const posts = snapshot.docs.map(collectIdsAndDocs);
+        this.setState({ posts });
+      });
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.getPosts();
-  }
-
-  handleCreate = async post => {
-    const docRef = await firestore.collection("posts").add(post);
-    const doc = await docRef.get();
-
-    const newPost = collectIdsAndDocs(doc);
-
-    this.setState({ posts: [newPost, ...this.state.posts] });
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(user => {
+      this.setState({ user });
+    });
   };
 
-  handleRemove = async id => {
-    const allPosts = this.state.posts;
-
-    await firestore.doc(`posts/${id}`).delete();
-
-    const posts = allPosts.filter(post => post.id !== id);
-    this.setState(
-      {
-        posts
-      },
-      () => console.log(this.state.posts)
-    );
+  componentWillUnmount = () => {
+    this.unsubscribeFromFirestore();
   };
 
   render() {
-    const { posts } = this.state;
+    const { posts, user } = this.state;
 
     return (
       <main className="Application">
         <h1>Blog</h1>
-        <Posts
-          posts={posts}
-          remove={this.handleRemove}
-          onCreate={this.handleCreate}
-        />
+        <Authentication user={user} />
+        <Posts posts={posts} />
       </main>
     );
   }
