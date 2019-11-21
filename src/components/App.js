@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Authentication from "./Authentication";
-import { firestore, auth } from "../firebase";
+import { firestore, auth, createUserProfileDocument } from "../firebase";
 import { collectIdsAndDocs } from "../utilities";
 
 import Posts from "./Posts";
@@ -25,7 +25,10 @@ class Application extends Component {
 
   componentDidMount = () => {
     this.getPosts();
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(user => {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      const user = await createUserProfileDocument(userAuth);
+      console.log(user);
+
       this.setState({ user });
     });
   };
